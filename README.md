@@ -106,7 +106,7 @@ Clone the repository and compile the optimized production release binary:
 
 ```bash
 git clone https://github.com/MohdAatifSiddi/VeloceIO.git
-cd veloce
+cd VeloceIO
 
 mkdir build && cd build
 cmake -DCMAKE_BUILD_TYPE=Release ..
