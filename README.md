@@ -140,7 +140,59 @@ export LD_PRELOAD=/path/to/build/libveloce.so
 vllm serve --model deepseek-ai/DeepSeek-V3 --tensor-parallel-size 8
 
 ```
+1. Copy the Code to your Linux GPU Machine
+Copy the project folder veloceio from your local machine to your GPU cloud instance:
 
+bash
+
+
+scp -r C:\Users\mekot\.gemini\antigravity\scratch\veloceio user@your-gpu-server-ip:~/veloceio
+2. Connect to the Server and Compile
+SSH into your GPU server and build the code using CMake:
+
+bash
+
+
+# Connect to your GPU server
+ssh user@your-gpu-server-ip
+# Navigate to the project directory
+cd ~/veloceio
+# Create a build directory
+mkdir build && cd build
+# Configure the project in Release mode
+cmake -DCMAKE_BUILD_TYPE=Release ..
+# Compile both libveloce.so and the test stress harness
+make -j$(nproc)
+3. Run the Stress Test Harness
+Execute the test harness to run high-concurrency memory copies across multiple GPUs and verify that all assertion checks pass:
+
+bash
+
+
+./veloce_test
+You should see output similar to this:
+
+text
+
+
+================================================================================
+Starting high-concurrency multi-GPU verification thread framework...
+================================================================================
+[Worker Thread 0 running on GPU 0] Processed 10 loop cycles. Performance Index: 242.4 GB/s
+[Worker Thread 1 running on GPU 1] Processed 10 loop cycles. Performance Index: 241.8 GB/s
+...
+SUCCESS: System integrity validated. No packet data drift observed.
+4. Direct PyTorch Interposition Verification
+To confirm that PyTorch's memory copies are transparently intercepted and accelerated:
+
+bash
+
+
+# Set the preloaded library
+export LD_PRELOAD=./libveloce.so
+# Run PyTorch with a memory copy that exceeds the 32MB threshold
+python3 -c "import torch; print('CUDA Intercept Ready:', torch.cuda.is_available()); x = torch.randn(8192, 8192, device='cuda')"
+This command will route the tensor allocation and copying logic through the libveloce.so intercept layers without requiring any changes to the PyTorch code.
 ---
 
 ## Structural Safeguards & Fallbacks
