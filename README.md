@@ -105,7 +105,7 @@ VeloceIO treats the node as a software-defined mesh network. It intercepts memor
 Clone the repository and compile the optimized production release binary:
 
 ```bash
-git clone https://github.com/veloceio/veloce.git
+git clone https://github.com/MohdAatifSiddi/VeloceIO.git
 cd veloce
 
 mkdir build && cd build
